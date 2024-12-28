@@ -1,7 +1,7 @@
 import json
 import pickle
 import pandas as pd
-from fpgrowth_py import fpgrowth
+from model import Model
 
 
 def main():
@@ -15,21 +15,13 @@ def main():
     min_confidence = params["min_confidence"]
 
     df = pd.read_csv(input_filename)
-    playlists = df.groupby("pid")["track_uri"].apply(list).values.tolist()
+    playlists = df.groupby("pid")["track_name"].apply(set).to_list()
 
-    rules = []
+    model = Model()
+    model.fit(playlists, min_support, min_confidence)
 
-    try:
-        _, rules = fpgrowth(playlists, min_support, min_confidence)
-    except Exception as e:
-        rules = []
-
-    tuple_rules = [(rule[0], rule[1]) for rule in rules]
-
-    pickle.dump(
-        tuple_rules,
-        open(output_filename, "wb"),
-    )
+    with open(output_filename, "wb") as f:
+        pickle.dump(model, f)
 
 
 if __name__ == "__main__":

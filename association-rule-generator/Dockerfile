@@ -5,6 +5,7 @@ WORKDIR /app
 RUN pip install pandas
 RUN pip install fpgrowth_py
 
+COPY ./model.py /app/model.py
 COPY ./main.py /app/main.py
 
 CMD ["python", "main.py"]
