@@ -28,6 +28,6 @@ if __name__ == "__main__":
     MODEL_PATH = os.environ.get("MODEL_PATH", "/app/model.pkl")
 
     with open(MODEL_PATH, "rb") as f:
-        model = pickle.load(f)
+        model: Model = pickle.load(f)
 
     app.run(host="0.0.0.0")

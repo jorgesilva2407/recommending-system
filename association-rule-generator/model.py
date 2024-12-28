@@ -1,7 +1,7 @@
 from fpgrowth_py import fpgrowth
 
 
-class Model:
+class Model():
     def __init__(self):
         self._rules: list[tuple[set[str], set[str]]] = []
 
