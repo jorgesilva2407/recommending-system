@@ -2,5 +2,5 @@
     "input_filename": "/input/playlists.csv",
     "min_confidence": 0.5,
     "min_support": 0.1,
-    "output_filename": "/output/association_rules.pkl"
+    "output_filename": "/output/model.pkl"
 }

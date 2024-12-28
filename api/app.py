@@ -25,10 +25,9 @@ def recommend():
 
 
 if __name__ == "__main__":
-    PORT = os.environ.get("PORT", 5000)
     MODEL_PATH = os.environ.get("MODEL_PATH", "/app/model.pkl")
 
     with open(MODEL_PATH, "rb") as f:
         model = pickle.load(f)
 
-    app.run(port=PORT)
+    app.run(host="0.0.0.0")

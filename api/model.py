@@ -8,8 +8,8 @@ class Model:
     def fit(
         self,
         x: list[set[str]],
-        min_support: float,
-        min_confidence: float,
+        min_support: float = 0.1,
+        min_confidence: float = 0.5,
     ):
         try:
             _, rules = fpgrowth(x, min_support, min_confidence)
