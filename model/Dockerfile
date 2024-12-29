@@ -2,8 +2,9 @@ FROM python:3.9.21-alpine
 
 WORKDIR /app
 
-RUN pip install pandas
-RUN pip install fpgrowth_py
+COPY ./requirements.txt /app/requirements.txt
+
+RUN pip install -r /app/requirements.txt
 
 COPY ./model.py /app/model.py
 COPY ./main.py /app/main.py

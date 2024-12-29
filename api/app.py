@@ -5,7 +5,12 @@ from flask_cors import CORS
 from model import Model
 
 app = Flask(__name__)
-CORS(app)
+CORS(
+    app,
+    origins="*",  # Allow all origins or specify your React app's origin
+    methods=["GET", "POST", "OPTIONS"],  # Explicitly allow OPTIONS
+    allow_headers=["Content-Type"],  # Allow the Content-Type header
+)
 model = None
 
 
@@ -15,6 +20,7 @@ def helthcheck():
 
 
 @app.route("/api/recommend", methods=["POST"])
+@app.route("/api/recommend/", methods=["POST"])
 def recommend():
     if model == None:
         return "Model not found", 500

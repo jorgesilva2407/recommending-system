@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: recommending-model-job
+spec:
+  template:
+    spec:
+      containers:
+        - name: recommending-model-job
+          image: recommending-model:latest
+          imagePullPolicy: Never
+          volumeMounts:
+            - mountPath: /input/playlists.csv
+              name: playlists
+            - mountPath: /output
+              name: output
+            - mountPath: /app/params.json
+              name: params
+      restartPolicy: Never
+      volumes:
+        - name: playlists
+          hostPath:
+            path: /Users/jlsilva/workspace/cloud/tp2/data/2023_spotify_ds1.csv
+        - name: output
+          hostPath:
+            path: /Users/jlsilva/workspace/cloud/tp2/pkl/
+        - name: params
+          hostPath:
+            path: /Users/jlsilva/workspace/cloud/tp2/model/params.json

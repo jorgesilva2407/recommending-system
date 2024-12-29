@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommending-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recommending-api
+  template:
+    metadata:
+      labels:
+        app: recommending-api
+    spec:
+      containers:
+        - name: recommending-api
+          image: recommending-api:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000
+          volumeMounts:
+            - mountPath: /app/model.pkl
+              name: model
+      volumes:
+        - name: model
+          hostPath:
+            path: /Users/jlsilva/workspace/cloud/tp2/pkl/model.pkl

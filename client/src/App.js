@@ -82,26 +82,26 @@ const App = () => {
   ];
 
   const handleGenerateRecommendation = async () => {
-    const recommendation_api_url =
-      process.env.REACT_APP_RECOMMENDATION_API_URL ||
-      "http://localhost:5001/api/recommend";
-
-    console.log(recommendation_api_url);
-
     const track_names = selectedSongs.map((song) => song.track_name);
 
     const body = {
       songs: track_names,
     };
 
-    const respose = await axios.post(recommendation_api_url, body);
+    try {
+      const response = await axios.post("/api/recommend", body);
 
-    if (respose.status === 200) {
-      const data = respose.data;
-      setRecommendedSongs(data.songs || []);
-      setIsModalVisible(true);
-    } else {
-      message.error("Failed to generate recommendation.");
+      if (response.status === 200) {
+        const data = response.data;
+        console.log(data);
+        setRecommendedSongs(data.songs || []);
+        setIsModalVisible(true);
+      } else {
+        message.error("Failed to generate recommendation.");
+      }
+    } catch (error) {
+      message.error("Error connecting to the server.");
+      console.error(error);
     }
   };
 
