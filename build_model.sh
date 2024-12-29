@@ -1,4 +1,4 @@
 #! /bin/bash
 
-cd association-rule-generator
-docker build -t association-rule-generator .
+cd model
+docker build -t recommending-model .

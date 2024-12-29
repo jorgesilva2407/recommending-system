@@ -22,11 +22,12 @@ def main():
 
     print("Preprocessing data...")
     playlists = df.groupby("pid")["track_name"].apply(list).to_list()
+    tracks = df["track_name"].unique().tolist()
     print("Data preprocessed.")
 
     print("Training model...")
     model = Model()
-    model.fit(playlists, min_support, min_confidence)
+    model.fit(playlists, tracks, min_support, min_confidence)
     print("Model trained.")
 
     print("Saving model...")
