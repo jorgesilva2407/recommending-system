@@ -19,13 +19,16 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 3000
+          volumeMounts:
+            - mountPath: /app/public/songs.csv
+              subPath: songs.csv
+              name: songs-volume
           env:
             - name: REACT_APP_RECOMMENDATION_API_URL
               value: "http://recommending-api:5000/api/recommend"
-          volumeMounts:
-            - mountPath: /app/public/songs.csv
-              name: songs
+            - name: REACT_APP_SONGS_PATH
+              value: /songs.csv
       volumes:
-        - name: songs
-          hostPath:
-            path: /Users/jlsilva/workspace/cloud/tp2/data/2023_spotify_new_songs.csv
+        - name: songs-volume
+          persistentVolumeClaim:
+            claimName: project2-pvc-jorgesilva

@@ -11,6 +11,6 @@ spec:
   storageClassName: default-storage-class
   accessModes:
     - ReadWriteMany
-  persistentVolumeReclaimPolicy: Recycle
+  persistentVolumeReclaimPolicy: Retain
   hostPath:
     path: /Users/jlsilva/workspace/cloud/tp2/data

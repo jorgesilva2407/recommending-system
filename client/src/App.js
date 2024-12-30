@@ -11,7 +11,8 @@ const App = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
-    fetch("/songs.csv")
+    const songs_path = process.env.REACT_APP_SONGS_PATH;
+    fetch(songs_path)
       .then((response) => {
         if (response.ok) return response.text();
         throw new Error("Failed to fetch the CSV file");

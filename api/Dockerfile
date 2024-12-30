@@ -6,7 +6,6 @@ COPY ./requirements.txt /app/requirements.txt
 
 RUN pip install -r /app/requirements.txt
 
-ENV MODEL_PATH=/app/model.pkl
 EXPOSE 5000 
 
 COPY ./model.py /app/model.py

@@ -20,9 +20,12 @@ spec:
           ports:
             - containerPort: 5000
           volumeMounts:
-            - mountPath: /app/model.pkl
-              name: model
+            - mountPath: /mnt/data
+              name: model-volume
+          env:
+            - name: MODEL_PATH
+              value: /mnt/data/model.pkl
       volumes:
-        - name: model
-          hostPath:
-            path: /Users/jlsilva/workspace/cloud/tp2/pkl/model.pkl
+        - name: model-volume
+          persistentVolumeClaim:
+            claimName: project2-pvc-jorgesilva

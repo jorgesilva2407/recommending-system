@@ -11,20 +11,19 @@ spec:
           image: recommending-model:latest
           imagePullPolicy: Never
           volumeMounts:
-            - mountPath: /input/playlists.csv
-              name: playlists
-            - mountPath: /output
-              name: output
-            - mountPath: /app/params.json
-              name: params
+            - mountPath: /mnt/data
+              name: data-volume
+          env:
+            - name: INPUT_FILENAME
+              value: /mnt/data/playlists.csv
+            - name: OUTPUT_FILENAME
+              value: /mnt/data/model.pkl
+            - name: MIN_SUPPORT
+              value: "0.1"
+            - name: MIN_CONFIDENCE
+              value: "0.1"
       restartPolicy: Never
       volumes:
-        - name: playlists
-          hostPath:
-            path: /Users/jlsilva/workspace/cloud/tp2/data/2023_spotify_ds1.csv
-        - name: output
-          hostPath:
-            path: /Users/jlsilva/workspace/cloud/tp2/pkl/
-        - name: params
-          hostPath:
-            path: /Users/jlsilva/workspace/cloud/tp2/model/params.json
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: project2-pvc-jorgesilva
