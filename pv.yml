@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  namespace: jorgesilva
+  name: project2-pv2-jorgesilva
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 1Gi
+  storageClassName: default-storage-class
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /Users/jlsilva/workspace/cloud/tp2/data

@@ -2,6 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: recommending-model-job
+  namespace: jorgesilva
 spec:
   template:
     spec:
