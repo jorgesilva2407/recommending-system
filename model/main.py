@@ -9,16 +9,18 @@ def main():
     print("INPUT_FILENAME", input_filename)
     output_filename = os.getenv("OUTPUT_FILENAME")
     print("OUTPUT_FILENAME", output_filename)
-    min_support = os.getenv("MIN_SUPPORT")
+    min_support = float(os.getenv("MIN_SUPPORT"))
     print("MIN_SUPPORT", min_support)
-    min_confidence = os.getenv("MIN_CONFIDENCE")
+    min_confidence = float(os.getenv("MIN_CONFIDENCE"))
     print("MIN_CONFIDENCE", min_confidence)
 
     df = pd.read_csv(input_filename)
     print("Data loaded")
 
-    playlists = df.groupby("pid")["track_name"].apply(list).to_list()
-    tracks = df["track_name"].unique().tolist()
+    playlists = (
+        df.groupby("pid")["track_name"].apply(lambda x: list(map(str, x))).to_list()
+    )
+    tracks = list(map(str, df["track_name"].unique().tolist()))
     print("Data processed")
 
     model = Model()

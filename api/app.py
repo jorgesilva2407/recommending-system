@@ -16,7 +16,7 @@ model = None
 
 @app.route("/")
 def helthcheck():
-    return "OK", 200
+    return "OK\n", 200
 
 
 @app.route("/api/recommend", methods=["POST"])
@@ -27,9 +27,15 @@ def recommend():
 
     data = request.get_json()
     x = set(data["songs"])
-    result = model.predict(x)
+    recommendation = model.predict(x)
 
-    return {"songs": list(result)}, 200
+    response = {
+        "songs": list(recommendation),
+        "version": model.version,
+        "model_date": model.fit_time,
+    }
+
+    return response, 200
 
 
 if __name__ == "__main__":

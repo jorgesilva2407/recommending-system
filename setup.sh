@@ -22,7 +22,4 @@ kubectl -n jorgesilva apply -f client/service.yml
 
 sleep 5
 
-kubectl -n jorgesilva port-forward service/recommending-api 30001:5000 &> /dev/null &
-kubectl -n jorgesilva port-forward service/recommending-client 30002:3000 &> /dev/null &
-
 kubectl -n jorgesilva get all
