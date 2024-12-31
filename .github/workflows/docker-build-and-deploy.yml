@@ -55,17 +55,17 @@ jobs:
       - name: Update API Deployment
         run: |
           cd kubernetes/api
-          sed -i "s|image: ${{ secrets.DOCKERHUB_USER }}/recommending-api:.*|image: ${{ secrets.DOCKERHUB_USER }}/api:${{ env.commit_hash }}|" deployment.yml
+          sed -i "s|image: ${{ secrets.DOCKERHUB_USER }}/recommending-api:.*|image: ${{ secrets.DOCKERHUB_USER }}/recommending-api:${{ env.commit_hash }}|" deployment.yml
 
       - name: Update Client Deployment
         run: |
           cd kubernetes/client
-          sed -i "s|image: ${{ secrets.DOCKERHUB_USER }}/recommending-client:.*|image: ${{ secrets.DOCKERHUB_USER }}/client:${ { env.commit_hash }}|" deployment.yml
+          sed -i "s|image: ${{ secrets.DOCKERHUB_USER }}/recommending-client:.*|image: ${{ secrets.DOCKERHUB_USER }}/recommending-client:${{ env.commit_hash }}|" deployment.yml
 
       - name: Update Model Deployment
         run: |
           cd kubernetes/model
-          sed -i "s|image: ${{ secrets.DOCKERHUB_USER }}/recommending-model:.*|image: ${{ secrets.DOCKERHUB_USER }}/model:${{ env.commit_hash }}|" job.yml
+          sed -i "s|image: ${{ secrets.DOCKERHUB_USER }}/recommending-model:.*|image: ${{ secrets.DOCKERHUB_USER }}/recommending-model:${{ env.commit_hash }}|" job.yml
 
       - name: Commit and Push Changes
         run: |
