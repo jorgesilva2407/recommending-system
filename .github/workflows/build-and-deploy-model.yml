@@ -1,0 +1,71 @@
+name: Build and Deploy Model
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - model/**
+      - data/**
+      - .github/workflows/build-and-deploy-model.yml
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set commit hash
+        id: vars
+        run: |
+          commit_hash=$(echo $GITHUB_SHA | cut -c1-7)
+          echo "commit_hash=$commit_hash" >> $GITHUB_ENV
+          echo "commit_hash=$commit_hash" >> $GITHUB_OUTPUT
+
+      - name: Build and Push Model image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USER }}/recommending-model:${{ env.commit_hash }} -f model/Dockerfile ./model
+          docker push ${{ secrets.DOCKERHUB_USER }}/recommending-model:${{ env.commit_hash }}
+
+    outputs:
+      commit_hash: ${{ steps.vars.outputs.commit_hash }}
+
+  update-kubernetes-repo:
+    name: Update Kubernetes Deployment Files
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Kubernetes Repository
+        uses: actions/checkout@v3
+        with:
+          repository: "jorgesilva2407/kubernetes-recommending-system"
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          path: kubernetes
+
+      - name: Verify Commit Hash
+        run: |
+          echo "Commit Hash from previous job: ${{ needs.build-and-push.outputs.commit_hash }}"
+
+      - name: Update Model Deployment
+        run: |
+          cd kubernetes/model
+          sed -i "s|image: ${{ secrets.DOCKERHUB_USER }}/recommending-model:.*|image: ${{ secrets.DOCKERHUB_USER }}/recommending-model:${{ needs.build-and-push.outputs.commit_hash }}|" job.yml
+
+      - name: Commit and Push Changes
+        run: |
+          cd kubernetes
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Update images to ${{ needs.build-and-push.outputs.commit_hash }}"
+          git push origin main
