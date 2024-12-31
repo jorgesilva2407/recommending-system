@@ -22,7 +22,10 @@ jobs:
 
       - name: Set commit hash
         id: vars
-        run: echo "commit_hash=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+        run: |
+          echo "commit_hash=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+          echo "Commit Hash: $GITHUB_SHA"
+          echo "commit_hash=${{ env.commit_hash }}"
 
       - name: Build and Push API image
         run: |
@@ -51,6 +54,9 @@ jobs:
           repository: "jorgesilva2407/kubernetes-recommending-system"
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           path: kubernetes
+
+      - name: Verify Commit Hash
+        run: echo "Commit Hash: ${{ env.commit_hash }}"
 
       - name: Update API Deployment
         run: |
