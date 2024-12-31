@@ -1,3 +1,4 @@
 flask
 flask-cors
 fpgrowth_py
+watchdog

@@ -3,15 +3,50 @@ import pickle
 from flask import Flask, request
 from flask_cors import CORS
 from model import Model
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+import time
+import threading
 
 app = Flask(__name__)
 CORS(
     app,
-    origins="*",  # Allow all origins or specify your React app's origin
-    methods=["GET", "POST", "OPTIONS"],  # Explicitly allow OPTIONS
-    allow_headers=["Content-Type"],  # Allow the Content-Type header
+    origins="*",
+    methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type"],
 )
-model = None
+
+model: Model | None = None
+MODEL_PATH = os.environ.get("MODEL_PATH")
+
+
+def load_model(model_path):
+    global model
+    with open(model_path, "rb") as f:
+        model = pickle.load(f)
+
+
+class ModelReloader(FileSystemEventHandler):
+    def __init__(self, model_path):
+        self.model_path = model_path
+
+    def on_modified(self, event):
+        if event.src_path == self.model_path:
+            load_model(self.model_path)
+
+
+def start_watcher(model_path):
+    event_handler = ModelReloader(model_path)
+    observer = Observer()
+    observer.schedule(event_handler, path=os.path.dirname(model_path), recursive=False)
+    observer.start()
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
 
 
 @app.route("/")
@@ -39,9 +74,13 @@ def recommend():
 
 
 if __name__ == "__main__":
-    MODEL_PATH = os.environ.get("MODEL_PATH", "/app/model.pkl")
+    try:
+        load_model(MODEL_PATH)
+    except Exception as e:
+        print(e)
 
-    with open(MODEL_PATH, "rb") as f:
-        model: Model = pickle.load(f)
+    watcher_thread = threading.Thread(target=start_watcher, args=(MODEL_PATH,))
+    watcher_thread.daemon = True
+    watcher_thread.start()
 
     app.run(host="0.0.0.0")
