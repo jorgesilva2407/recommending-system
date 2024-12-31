@@ -169,10 +169,10 @@ const App = () => {
         ]}
       >
         <p>
-          <strong>Version:</strong> {recommendedSongs.version}
+          <strong>Version:</strong> {modelVersion}
         </p>
         <p>
-          <strong>Model Date:</strong> {recommendedSongs.model_date}
+          <strong>Model Date:</strong> {modelDate}
         </p>
         <List
           bordered
