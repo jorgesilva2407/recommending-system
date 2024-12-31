@@ -1,5 +1,6 @@
 import os
 import pickle
+from typing import Union
 from flask import Flask, request
 from flask_cors import CORS
 from model import Model
@@ -16,7 +17,7 @@ CORS(
     allow_headers=["Content-Type"],
 )
 
-model: Model | None = None
+model: Union[Model, None] = None
 MODEL_PATH = os.environ.get("MODEL_PATH")
 
 
