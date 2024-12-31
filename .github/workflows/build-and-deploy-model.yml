@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - model/**
-      - data/**
+      - data/playlists.csv
       - .github/workflows/build-and-deploy-model.yml
 
 jobs:
