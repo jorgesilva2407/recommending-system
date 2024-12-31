@@ -34,6 +34,7 @@ class ModelReloader(FileSystemEventHandler):
     def on_modified(self, event):
         if event.src_path == self.model_path:
             load_model(self.model_path)
+            print("Model reloaded")
 
 
 def start_watcher(model_path):
