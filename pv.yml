@@ -13,4 +13,4 @@ spec:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   hostPath:
-    path: /Users/jlsilva/workspace/cloud/tp2/data
+    path: /Users/jlsilva/workspace/cloud/tp2/recommending-system/data
