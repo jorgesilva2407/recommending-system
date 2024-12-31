@@ -22,9 +22,13 @@ MODEL_PATH = os.environ.get("MODEL_PATH")
 
 
 def load_model(model_path):
-    global model
-    with open(model_path, "rb") as f:
-        model = pickle.load(f)
+    try:
+        global model
+        with open(model_path, "rb") as f:
+            model = pickle.load(f)
+        print("Model loaded")
+    except Exception as e:
+        print(e)
 
 
 class ModelReloader(FileSystemEventHandler):
@@ -76,10 +80,7 @@ def recommend():
 
 
 if __name__ == "__main__":
-    try:
-        load_model(MODEL_PATH)
-    except Exception as e:
-        print(e)
+    load_model(MODEL_PATH)
 
     watcher_thread = threading.Thread(target=start_watcher, args=(MODEL_PATH,))
     watcher_thread.daemon = True
