@@ -8,6 +8,8 @@ const App = () => {
   const [selectedSongs, setSelectedSongs] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [recommendedSongs, setRecommendedSongs] = useState([]);
+  const [modelVersion, setModelVersion] = useState("");
+  const [modelDate, setModelDate] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
@@ -96,6 +98,8 @@ const App = () => {
         const data = response.data;
         console.log(data);
         setRecommendedSongs(data.songs || []);
+        setModelVersion(data.version);
+        setModelDate(data.model_date);
         setIsModalVisible(true);
       } else {
         message.error("Failed to generate recommendation.");
@@ -156,7 +160,7 @@ const App = () => {
 
       <Modal
         title="Recommended Songs"
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={handleCloseModal}
         footer={[
           <Button key="close" onClick={handleCloseModal}>
@@ -164,6 +168,12 @@ const App = () => {
           </Button>,
         ]}
       >
+        <p>
+          <strong>Version:</strong> {recommendedSongs.version}
+        </p>
+        <p>
+          <strong>Model Date:</strong> {recommendedSongs.model_date}
+        </p>
         <List
           bordered
           dataSource={recommendedSongs}
