@@ -3,12 +3,12 @@ set -x
 
 minikube start
 minikube mount /Users/jlsilva:/Users/jlsilva &> /dev/null &
-./build_model.sh
-./build_api.sh
-./build_client.sh
-minikube image load recommending-model
-minikube image load recommending-api
-minikube image load recommending-client
+# ./build_model.sh
+# ./build_api.sh
+# ./build_client.sh
+# minikube image load recommending-model
+# minikube image load recommending-api
+# minikube image load recommending-client
 
 kubectl create namespace jorgesilva
 kubectl -n jorgesilva apply -f pv.yml

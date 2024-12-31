@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: recommending-client
-          image: recommending-client:latest
-          imagePullPolicy: Never
+          image: silvajorge/recommending-client:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           volumeMounts:
