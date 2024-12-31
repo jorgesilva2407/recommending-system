@@ -23,8 +23,9 @@ jobs:
       - name: Set commit hash
         id: vars
         run: |
-          echo "commit_hash=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
-          echo "::set-output name=commit_hash::$(echo $GITHUB_SHA | cut -c1-7)"
+          commit_hash=$(echo $GITHUB_SHA | cut -c1-7)
+          echo "commit_hash=$commit_hash" >> $GITHUB_ENV
+          echo "commit_hash=$commit_hash" >> $GITHUB_OUTPUT
 
       - name: Build and Push API image
         run: |
