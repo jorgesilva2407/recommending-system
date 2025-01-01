@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, List, message, Input, Modal } from "antd";
+import { Table, Button, List, message, Input, Modal, Spin } from "antd";
 import Papa from "papaparse";
 import axios from "axios";
 
@@ -11,6 +11,7 @@ const App = () => {
   const [modelVersion, setModelVersion] = useState("");
   const [modelDate, setModelDate] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const songs_path = process.env.REACT_APP_SONGS_PATH;
@@ -34,9 +35,11 @@ const App = () => {
         }));
 
         setSongs(formattedData);
+        setLoading(false); // Set loading to false once data is fetched
       })
       .catch((error) => {
         message.error("Error loading CSV: " + error.message);
+        setLoading(false); // Set loading to false if there's an error
       });
   }, []);
 
@@ -119,43 +122,49 @@ const App = () => {
     <div style={{ padding: "20px" }}>
       <h1>Song Selector</h1>
 
-      {selectedSongs.length > 0 && (
-        <div style={{ marginBottom: "20px" }}>
-          <h2>Selected Songs</h2>
-          <List
-            bordered
-            dataSource={selectedSongs}
-            style={{ marginBottom: "10px" }}
-            renderItem={(item) => (
-              <List.Item>
-                {item.artist_name} - {item.track_name}
-              </List.Item>
-            )}
-          />
-          <Button type="primary" onClick={handleGenerateRecommendation}>
-            Generate Recommendation
-          </Button>
-        </div>
-      )}
-
-      <Input
-        placeholder="Search for songs..."
-        value={searchTerm}
-        onChange={handleSearchChange}
-        style={{ width: 300, marginBottom: "20px" }}
-      />
-
-      {filteredSongs.length > 0 ? (
-        <>
-          <h2>Available Songs</h2>
-          <Table
-            dataSource={filteredSongs}
-            columns={columns}
-            rowKey="track_name"
-          />
-        </>
+      {loading ? (
+        <Spin size="large" tip="Loading songs..." />
       ) : (
-        <p>No songs found matching the search criteria.</p>
+        <>
+          {selectedSongs.length > 0 && (
+            <div style={{ marginBottom: "20px" }}>
+              <h2>Selected Songs</h2>
+              <List
+                bordered
+                dataSource={selectedSongs}
+                style={{ marginBottom: "10px" }}
+                renderItem={(item) => (
+                  <List.Item>
+                    {item.artist_name} - {item.track_name}
+                  </List.Item>
+                )}
+              />
+              <Button type="primary" onClick={handleGenerateRecommendation}>
+                Generate Recommendation
+              </Button>
+            </div>
+          )}
+
+          <Input
+            placeholder="Search for songs..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            style={{ width: 300, marginBottom: "20px" }}
+          />
+
+          {filteredSongs.length > 0 ? (
+            <>
+              <h2>Available Songs</h2>
+              <Table
+                dataSource={filteredSongs}
+                columns={columns}
+                rowKey="track_name"
+              />
+            </>
+          ) : (
+            <p>No songs found matching the search criteria.</p>
+          )}
+        </>
       )}
 
       <Modal
