@@ -23,17 +23,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set commit hash
-        id: vars
-        run: |
-          commit_hash=$(echo $GITHUB_SHA | cut -c1-7)
-          echo "commit_hash=$commit_hash" >> $GITHUB_ENV
-          echo "commit_hash=$commit_hash" >> $GITHUB_OUTPUT
-
       - name: Build and Push Client image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USER }}/recommending-client:${{ env.commit_hash }} -f client/Dockerfile ./client
-          docker push ${{ secrets.DOCKERHUB_USER }}/recommending-client:${{ env.commit_hash }}
+          docker build -t ${{ secrets.DOCKERHUB_USER }}/recommending-client:latest -f client/Dockerfile ./client
+          docker push ${{ secrets.DOCKERHUB_USER }}/recommending-client:latest
 
     outputs:
       commit_hash: ${{ steps.vars.outputs.commit_hash }}
