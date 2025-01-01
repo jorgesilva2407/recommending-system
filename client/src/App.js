@@ -95,7 +95,10 @@ const App = () => {
     };
 
     try {
-      const response = await axios.post("/api/recommend", body);
+      const response = await axios.post(
+        process.env.REACT_APP_RECOMMENDATION_API_URL,
+        body
+      );
 
       if (response.status === 200) {
         const data = response.data;
