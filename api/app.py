@@ -1,13 +1,18 @@
 import os
 import pickle
+import logging
 from typing import Union
 from flask import Flask, request
 from flask_cors import CORS
 from model import Model
-from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import time
 import threading
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 
 app = Flask(__name__)
 CORS(
@@ -26,9 +31,9 @@ def load_model(model_path):
         global model
         with open(model_path, "rb") as f:
             model = pickle.load(f)
-        print("Model loaded")
+        logging.info("Model loaded")
     except Exception as e:
-        print(e)
+        logging.error(f"Error loading model: {e}")
 
 
 class ModelReloader(FileSystemEventHandler):
@@ -38,21 +43,20 @@ class ModelReloader(FileSystemEventHandler):
     def on_modified(self, event):
         if event.src_path == self.model_path:
             load_model(self.model_path)
-            print("Model reloaded")
+            logging.info("Model reloaded")
 
 
-def start_watcher(model_path):
-    event_handler = ModelReloader(model_path)
-    observer = Observer()
-    observer.schedule(event_handler, path=os.path.dirname(model_path), recursive=False)
-    observer.start()
-
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        observer.stop()
-    observer.join()
+def start_polling(model_path):
+    last_modified_time = None
+    while True:
+        if os.path.exists(model_path):
+            current_time = os.path.getmtime(model_path)
+            if last_modified_time is None or current_time > last_modified_time:
+                load_model(model_path)
+                last_modified_time = current_time
+        else:
+            logging.warning("Model not found")
+        time.sleep(5)
 
 
 @app.route("/")
@@ -82,7 +86,7 @@ def recommend():
 if __name__ == "__main__":
     load_model(MODEL_PATH)
 
-    watcher_thread = threading.Thread(target=start_watcher, args=(MODEL_PATH,))
+    watcher_thread = threading.Thread(target=start_polling, args=(MODEL_PATH,))
     watcher_thread.daemon = True
     watcher_thread.start()
 
