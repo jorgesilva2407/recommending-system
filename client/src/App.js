@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { Table, Button, List, message, Input, Modal } from "antd";
+import Papa from "papaparse";
+import axios from "axios";
 
 const App = () => {
   const [songs, setSongs] = useState([]);
@@ -17,19 +20,24 @@ const App = () => {
         throw new Error("Failed to fetch the CSV file");
       })
       .then((csvText) => {
-        const parsedData = csvText
-          .split("\n")
-          .slice(1) // skip header
-          .map((line) => {
-            const [artist_name, track_name] = line.split(",");
-            return {
-              artist_name: artist_name.trim(),
-              track_name: track_name.trim(),
-            };
-          });
-        setSongs(parsedData);
+        const parsedData = Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          dynamicTyping: true,
+          delimiter: ",",
+        });
+
+        const formattedData = parsedData.data.map((song) => ({
+          ...song,
+          artist_name: String(song.artist_name),
+          track_name: String(song.track_name),
+        }));
+
+        setSongs(formattedData);
       })
-      .catch((error) => alert("Error loading CSV: " + error.message));
+      .catch((error) => {
+        message.error("Error loading CSV: " + error.message);
+      });
   }, []);
 
   const addSongToList = (record) => {
@@ -41,11 +49,11 @@ const App = () => {
       )
     ) {
       setSelectedSongs((prev) => [...prev, record]);
-      alert(
+      message.success(
         `Added "${record.track_name}" by ${record.artist_name} to the list!`
       );
     } else {
-      alert(
+      message.warning(
         `"${record.track_name}" by ${record.artist_name} is already in the list.`
       );
     }
@@ -57,33 +65,48 @@ const App = () => {
 
   const filteredSongs = songs.filter((song) => {
     return (
-      song.artist_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      song.track_name.toLowerCase().includes(searchTerm.toLowerCase())
+      song.artist_name.includes(searchTerm) ||
+      song.track_name.includes(searchTerm)
     );
   });
 
+  const columns = [
+    { title: "Artist", dataIndex: "artist_name", key: "artist" },
+    { title: "Track", dataIndex: "track_name", key: "track" },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Button type="primary" onClick={() => addSongToList(record)}>
+          Add
+        </Button>
+      ),
+    },
+  ];
+
   const handleGenerateRecommendation = async () => {
     const track_names = selectedSongs.map((song) => song.track_name);
-    const body = { songs: track_names };
+
+    const body = {
+      songs: track_names,
+    };
 
     try {
-      const response = await fetch("/api/recommend", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+      const response = await axios.post("/api/recommend", body);
 
-      if (response.ok) {
-        const data = await response.json();
+      if (response.status === 200) {
+        const data = response.data;
+        console.log(data);
         setRecommendedSongs(data.songs || []);
         setModelVersion(data.version);
         setModelDate(data.model_date);
         setIsModalVisible(true);
       } else {
-        alert("Failed to generate recommendation.");
+        message.error("Failed to generate recommendation.");
       }
     } catch (error) {
-      alert("Error connecting to the server.");
+      message.error("Error connecting to the server.");
+      console.error(error);
     }
   };
 
@@ -99,21 +122,23 @@ const App = () => {
       {selectedSongs.length > 0 && (
         <div style={{ marginBottom: "20px" }}>
           <h2>Selected Songs</h2>
-          <ul>
-            {selectedSongs.map((item, index) => (
-              <li key={index}>
+          <List
+            bordered
+            dataSource={selectedSongs}
+            style={{ marginBottom: "10px" }}
+            renderItem={(item) => (
+              <List.Item>
                 {item.artist_name} - {item.track_name}
-              </li>
-            ))}
-          </ul>
-          <button onClick={handleGenerateRecommendation}>
+              </List.Item>
+            )}
+          />
+          <Button type="primary" onClick={handleGenerateRecommendation}>
             Generate Recommendation
-          </button>
+          </Button>
         </div>
       )}
 
-      <input
-        type="text"
+      <Input
         placeholder="Search for songs..."
         value={searchTerm}
         onChange={handleSearchChange}
@@ -123,69 +148,40 @@ const App = () => {
       {filteredSongs.length > 0 ? (
         <>
           <h2>Available Songs</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Artist</th>
-                <th>Track</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredSongs.map((song, index) => (
-                <tr key={index}>
-                  <td>{song.artist_name}</td>
-                  <td>{song.track_name}</td>
-                  <td>
-                    <button onClick={() => addSongToList(song)}>Add</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Table
+            dataSource={filteredSongs}
+            columns={columns}
+            rowKey="track_name"
+          />
         </>
       ) : (
         <p>No songs found matching the search criteria.</p>
       )}
 
-      {isModalVisible && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              background: "white",
-              padding: "20px",
-              borderRadius: "8px",
-              width: "300px",
-            }}
-          >
-            <h2>Recommended Songs</h2>
-            <p>
-              <strong>Version:</strong> {modelVersion}
-            </p>
-            <p>
-              <strong>Model Date:</strong> {modelDate}
-            </p>
-            <ul>
-              {recommendedSongs.map((song, index) => (
-                <li key={index}>{song}</li>
-              ))}
-            </ul>
-            <button onClick={handleCloseModal}>Close</button>
-          </div>
-        </div>
-      )}
+      <Modal
+        title="Recommended Songs"
+        open={isModalVisible}
+        onCancel={handleCloseModal}
+        footer={[
+          <Button key="close" onClick={handleCloseModal}>
+            Close
+          </Button>,
+        ]}
+      >
+        <p>
+          <strong>Version:</strong> {modelVersion}
+        </p>
+        <p>
+          <strong>Model Date:</strong> {modelDate}
+        </p>
+        <List
+          bordered
+          dataSource={recommendedSongs}
+          renderItem={(song, index) => (
+            <List.Item key={index}>{song}</List.Item>
+          )}
+        />
+      </Modal>
     </div>
   );
 };
