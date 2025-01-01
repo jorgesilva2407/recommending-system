@@ -27,6 +27,3 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USER }}/recommending-client:latest -f client/Dockerfile ./client
           docker push ${{ secrets.DOCKERHUB_USER }}/recommending-client:latest
-
-    outputs:
-      commit_hash: ${{ steps.vars.outputs.commit_hash }}
