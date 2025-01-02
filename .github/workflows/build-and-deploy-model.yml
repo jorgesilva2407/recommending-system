@@ -59,7 +59,7 @@ jobs:
       - name: Update Model Deployment
         run: |
           cd kubernetes/model
-          sed -i "s|name: recommending-model-job-.*|name: recommending-model-job-${{ needs.build-and-push.outputs.commit_hash }}|" job.yml
+          sed -i "s|name: recommending-model-.*|name: recommending-model-${{ needs.build-and-push.outputs.commit_hash }}|" job.yml
           sed -i "s|image: ${{ secrets.DOCKERHUB_USER }}/recommending-model:.*|image: ${{ secrets.DOCKERHUB_USER }}/recommending-model:${{ needs.build-and-push.outputs.commit_hash }}|" job.yml
 
       - name: Commit and Push Changes
