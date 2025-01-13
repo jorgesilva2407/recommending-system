@@ -1,5 +1,7 @@
 FROM python:3.9.21-alpine
 
+ENV VERSION v1.0.0
+
 WORKDIR /app
 
 COPY ./requirements.txt /app/requirements.txt

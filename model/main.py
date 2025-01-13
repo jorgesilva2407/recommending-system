@@ -14,6 +14,8 @@ def main():
     print("MIN_SUPPORT", min_support)
     min_confidence = float(os.getenv("MIN_CONFIDENCE"))
     print("MIN_CONFIDENCE", min_confidence)
+    version = os.getenv("VERSION")
+    print("VERSION", version)
 
     input_filename = "/tmp/playlists.csv"
     response = requests.get(input_file_link)
@@ -33,7 +35,7 @@ def main():
     tracks = list(map(str, df["track_name"].unique().tolist()))
     print("Data processed")
 
-    model = Model()
+    model = Model(version)
     model.fit(playlists, tracks, min_support, min_confidence)
     print("Model trained")
 
