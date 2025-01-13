@@ -1,0 +1,20 @@
+project: jorgesilva-project
+source:
+  repoURL: https://github.com/jorgesilva2407/kubernetes-recommending-system.git
+  path: .
+  targetRevision: HEAD
+  directory:
+    recurse: true
+    jsonnet: {}
+destination:
+  server: https://kubernetes.default.svc
+  namespace: jorgesilva
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
+  syncOptions:
+    - PruneLast=true
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true
