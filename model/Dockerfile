@@ -1,6 +1,6 @@
 FROM python:3.9.21-alpine
 
-ENV VERSION v1.0.4
+ENV VERSION v1.0.5
 
 WORKDIR /app
 
